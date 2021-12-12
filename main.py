@@ -16,7 +16,7 @@ def is_bitlink(token, site):
     parsed_link = urlparse(site)
     bitlink = f'{parsed_link.netloc}{parsed_link.path}'
     url = f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}'
-    headers = {'Authorization': f'Bearer0 {token}'}
+    headers = {'Authorization': f'Bearer {token}'}
     response = requests.get(url, headers=headers)
     return response.ok
 
