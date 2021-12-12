@@ -16,7 +16,7 @@ def is_bitlink(token, site):
     parsed_link = urlparse(site)
     bitlink = f'{parsed_link.netloc}{parsed_link.path}'
     url = f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}'
-    headers = {'Authorization': token}
+    headers = {'Authorization': f'Bearer0 {token}'}
     response = requests.get(url, headers=headers)
     return response.ok
 
@@ -24,7 +24,7 @@ def is_bitlink(token, site):
 def shorten_link(token, site):
     url = f'https://api-ssl.bitly.com/v4/bitlinks'
     data = {'long_url': site}
-    headers = {'Authorization': token}
+    headers = {'Authorization': f'Bearer {token}'}
     response = requests.post(url, headers=headers, json=data)
     response.raise_for_status()
     api_answer = response.json()
@@ -32,7 +32,7 @@ def shorten_link(token, site):
 
 
 def count_clicks(token, bitlink):
-    headers = {'Authorization': token}
+    headers = {'Authorization': f'Bearer {token}'}
     parsed_link = urlparse(bitlink)
     bitlink = f'{parsed_link.netloc}{parsed_link.path}'
     url = f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}/clicks/summary'
@@ -48,7 +48,6 @@ def count_clicks(token, bitlink):
 
 def main():
     load_dotenv()
-    unknown_error_msg = 'Ответ не получен. Зайдите позже'
     try:
         parser = create_parser()
         arguments = parser.parse_args()
@@ -65,11 +64,16 @@ def main():
 
     except (requests.exceptions.HTTPError, requests.exceptions.InvalidSchema, requests.exceptions.ConnectionError) as e:
         error_data = e.response
-        if not error_data:
+        error_code = error_data.status_code
+        if error_code == 400:
             print('Вы ошиблись при вводе сайта')
+        elif error_code == 403:
+            print('Доступ запрещён. Проверьте токен')
+        else:
+            print('Ошибка доступа: ', error_code)
 
-    except (TypeError, KeyError):
-        print(unknown_error_msg)
+    except FileNotFoundError:
+        print('Вы ошиблись в имени скрипта main.py или пути к нему')
 
 
 if __name__ == '__main__':

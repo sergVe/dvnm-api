@@ -11,6 +11,12 @@ pip install -r requirements.txt
 ```
 >3.8
 ```
+## Переменные окружения
+1. Создайте в корне проекта файл .env
+2. Запишите в него токен, полученный на https://bit.ly
+```python
+BITLY_TOKEN='your_token'
+```
 ## Примеры использования
 ```
 $ python3.10 main.py https://google.com
